@@ -39,9 +39,13 @@ class Weather(Base):
     # Зв'язок з AstronomyInfo
     astronomy = relationship("AstronomyInfo", back_populates="weather", uselist=False)
 
-class SafetyLevel(enum.Enum):
-    YES = "yes"
-    NO = "no"
+# class SafetyLevel(enum.Enum):
+#     YES = "yes"
+#     NO = "no"
+
+class SafetyLevelLower(enum.Enum):
+    yes = "yes"
+    no = "no"
 
 # Таблиця з даними про небесні тіла
 class AstronomyInfo(Base):
@@ -55,7 +59,7 @@ class AstronomyInfo(Base):
     moon_phase = Column(String)
     moon_illumination = Column(Integer)
 
-    is_safe_to_go_out = Column(Enum(SafetyLevel, name="safetylevel"))
+    is_safe_to_go_out = Column(Enum(SafetyLevelLower, name="safetylevel_lower"))
 
     # зворотній зв'язок
     weather = relationship("Weather", back_populates="astronomy")

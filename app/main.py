@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
 from sqlalchemy.orm import Session
-from app.models import Weather, AstronomyInfo, WindDirection
+from app.models import Weather, AstronomyInfo, WindDirection, SafetyLevelLower
 from app.db import SessionLocal
 import os
 
@@ -31,15 +31,35 @@ def import_data():
                 country = row.get("country")
                 date = parse_date(row.get("last_updated"))
 
+                # existing = session.query(Weather).filter_by(
+                #     country=country,
+                #     last_updated=date
+                # ).first()
+# 
+                # if existing:
+                #     skipped += 1
+                #     continue
+
                 existing = session.query(Weather).filter_by(
                     country=country,
                     last_updated=date
                 ).first()
-
+                
                 if existing:
-                    skipped += 1
-                    continue
-
+                    weather = existing
+                else:
+                    wd = (row.get("wind_direction") or "").strip().upper()
+                    weather = Weather(
+                        country=country,
+                        wind_degree=int(row.get("wind_degree") or 0),
+                        wind_kph=float(row.get("wind_kph") or 0.0),
+                        wind_direction=WindDirection[wd] if wd in WindDirection.__members__ else None,
+                        last_updated=date,
+                        sunrise=parse_time(row.get("sunrise"))
+                    )
+                    session.add(weather)
+                    session.flush()
+                
                 wd = (row.get("wind_direction") or "").strip().upper()
                 weather = Weather(
                     country=country,
@@ -53,7 +73,7 @@ def import_data():
                 session.add(weather)
                 session.flush()
 
-                moon_illumination = int(row.get("moon_illumination") or 0)
+                # moon_illumination = int(row.get("moon_illumination") or 0)
 
                 # логіка безпеки: якщо вітер сильний або затемнено — не варто виходити
                 # is_safe = not (
@@ -63,7 +83,7 @@ def import_data():
                 moon_illum = int(row.get("moon_illumination") or 0)
                 wind_speed = float(row.get("wind_kph") or 0.0)
 
-                is_safe = "no" if wind_speed > 20 or moon_illum < 10 else "yes"
+                is_safe = SafetyLevelLower.no if wind_speed > 20 or moon_illum < 10 else SafetyLevelLower.yes
 
                 astronomy = AstronomyInfo(
                     weather_id=weather.id,

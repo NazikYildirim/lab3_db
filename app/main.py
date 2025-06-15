@@ -15,7 +15,7 @@ def parse_time(value):
 
 def parse_date(value):
     try:
-        return datetime.strptime(value.strip(), "%Y-%m-%d").date()
+        return datetime.strptime(value.strip().split(" ")[0], "%Y-%m-%d").date()
     except:
         return None
 
@@ -40,11 +40,12 @@ def import_data():
                     skipped += 1
                     continue
 
+                wd = (row.get("wind_direction") or "").strip().upper()
                 weather = Weather(
                     country=country,
                     wind_degree=int(row.get("wind_degree") or 0),
                     wind_kph=float(row.get("wind_kph") or 0.0),
-                    wind_direction=WindDirection[row.get("wind_dir")] if row.get("wind_dir") in WindDirection.__members__ else None,
+                    wind_direction=WindDirection[wd] if wd in WindDirection.__members__ else None,
                     last_updated=date,
                     sunrise=parse_time(row.get("sunrise"))
                 )
@@ -52,13 +53,26 @@ def import_data():
                 session.add(weather)
                 session.flush()
 
+                moon_illumination = int(row.get("moon_illumination") or 0)
+
+                # логіка безпеки: якщо вітер сильний або затемнено — не варто виходити
+                # is_safe = not (
+                #     weather.wind_kph > 20 or moon_illumination < 10
+                # )
+
+                moon_illum = int(row.get("moon_illumination") or 0)
+                wind_speed = float(row.get("wind_kph") or 0.0)
+
+                is_safe = "no" if wind_speed > 20 or moon_illum < 10 else "yes"
+
                 astronomy = AstronomyInfo(
                     weather_id=weather.id,
                     sunset=parse_time(row.get("sunset")),
                     moonrise=parse_time(row.get("moonrise")),
                     moonset=parse_time(row.get("moonset")),
                     moon_phase=row.get("moon_phase"),
-                    moon_illumination=int(row.get("moon_illumination") or 0)
+                    moon_illumination=moon_illum,
+                    is_safe_to_go_out=is_safe
                 )
 
                 session.add(astronomy)

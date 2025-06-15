@@ -7,13 +7,22 @@ Base = declarative_base()
 # Enum для напряму вітру
 class WindDirection(enum.Enum):
     N = "N"
-    S = "S"
-    E = "E"
-    W = "W"
+    NNE = "NNE"
     NE = "NE"
-    NW = "NW"
+    ENE = "ENE"
+    E = "E"
+    ESE = "ESE"
     SE = "SE"
+    SSE = "SSE"
+    S = "S"
+    SSW = "SSW"
     SW = "SW"
+    WSW = "WSW"
+    W = "W"
+    WNW = "WNW"
+    NW = "NW"
+    NNW = "NNW"
+
 
 # Основна таблиця
 class Weather(Base):
@@ -30,6 +39,10 @@ class Weather(Base):
     # Зв'язок з AstronomyInfo
     astronomy = relationship("AstronomyInfo", back_populates="weather", uselist=False)
 
+class SafetyLevel(enum.Enum):
+    YES = "yes"
+    NO = "no"
+
 # Таблиця з даними про небесні тіла
 class AstronomyInfo(Base):
     __tablename__ = "astronomy_info"
@@ -41,6 +54,8 @@ class AstronomyInfo(Base):
     moonset = Column(Time)
     moon_phase = Column(String)
     moon_illumination = Column(Integer)
+
+    is_safe_to_go_out = Column(Enum(SafetyLevel, name="safetylevel"))
 
     # зворотній зв'язок
     weather = relationship("Weather", back_populates="astronomy")

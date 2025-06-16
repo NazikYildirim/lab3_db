@@ -29,7 +29,7 @@ class Weather(Base):
     __tablename__ = "weather"
 
     id = Column(Integer, primary_key=True)
-    country = Column(String)
+    country = Column(String(255))
     wind_degree = Column(Integer)
     wind_kph = Column(Float)
     wind_direction = Column(Enum(WindDirection))
@@ -56,7 +56,7 @@ class AstronomyInfo(Base):
     sunset = Column(Time)
     moonrise = Column(Time)
     moonset = Column(Time)
-    moon_phase = Column(String)
+    moon_phase = Column(String(255))
     moon_illumination = Column(Integer)
 
     is_safe_to_go_out = Column(Enum(SafetyLevelLower, name="safetylevel_lower"))

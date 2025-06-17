@@ -40,3 +40,11 @@ pip install -r requirements.txt
 alembic upgrade head
 4. Імпорт даних:
 python -m app.main
+
+## 🔍 Навігація по завданнях
+
+- **Завдання 1** – опис моделей (ORM) - task-1-models
+- **Завдання 2** – рефакторинг структури БД через Alembic - task-2-alembic-refactor
+- **Завдання 3** – обчислення колонки is_safe_to_go_out - task-3-safety-logic
+- **Завдання 4** – консольна утиліта (CLI) - task-4-cli-tool
+- **Завдання 5** – міграція з PostgreSQL до MySQL - task-5-mysql-migration

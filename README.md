@@ -41,7 +41,7 @@ alembic upgrade head
 4. Імпорт даних:
 python -m app.main
 
-## 🔍 Навігація по завданнях
+## Навігація по завданнях
 
 - **Завдання 1** – опис моделей (ORM) - task-1-models
 - **Завдання 2** – рефакторинг структури БД через Alembic - task-2-alembic-refactor
